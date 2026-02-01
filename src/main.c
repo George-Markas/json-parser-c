@@ -9,7 +9,7 @@ void free_tokens(const AList_t *tokens);
 int main(void) {
     char *buf = file_to_string("../test.json");
     AList_t *tokens = tokenize(buf);
-    free(buf);
+    free(buf); buf = NULL;
 
     print_tokens(tokens);
 
@@ -21,16 +21,16 @@ int main(void) {
 void print_tokens(const AList_t *tokens) {
     for (size_t i = 0; i < tokens->length; i++) {
         const char *tok_type_to_str[] = {
-            "BRACE_OPEN:        ",
-            "BRACE_CLOSE:       ",
-            "BRACKET_OPEN:      ",
-            "BRACKET_CLOSE:     ",
-            "JSON_COLON:        ",
-            "JSON_COMMA:        ",
-            "JSON_STRING:       ",
-            "JSON_NUMBER:       ",
-            "JSON_BOOLEAN:      ",
-            "JSON_NULL:         "
+            "\x1B[32mBRACE_OPEN:   \x1B[0m",
+            "\x1B[32mBRACE_CLOSE:  \x1B[0m",
+            "\x1B[32mBRACKET_OPEN: \x1B[0m",
+            "\x1B[32mBRACKET_CLOSE:\x1B[0m",
+            "\x1B[32mJSON_COLON:   \x1B[0m",
+            "\x1B[32mJSON_COMMA:   \x1B[0m",
+            "\x1B[32mJSON_STRING:  \x1B[0m",
+            "\x1B[32mJSON_NUMBER:  \x1B[0m",
+            "\x1B[32mJSON_BOOLEAN: \x1B[0m",
+            "\x1B[32mJSON_NULL:    \x1B[0m"
         };
 
         const token_t *tok = *(token_t **) array_list_get(tokens, i);
@@ -52,7 +52,10 @@ void print_tokens(const AList_t *tokens) {
 void free_tokens(const AList_t *tokens) {
     for (size_t i = 0; i < tokens->length; i++) {
         token_t *tok = *(token_t **) array_list_get(tokens, i);
-        if (tok->type == JSON_STRING && tok->string != NULL) free(tok->string);
-        free(tok);
+        if (tok->type == JSON_STRING && tok->string != NULL) {
+            free(tok->string); tok->string = NULL;
+        }
+
+        free(tok); tok = NULL;
     }
 }
