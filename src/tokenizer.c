@@ -6,6 +6,20 @@
 #include <string.h>
 #include <ctype.h>
 
+const char *tok_type_to_str[] = {
+    "TOK_L_BRACE   ",
+    "TOK_R_BRACE   ",
+    "TOK_L_BRACKET:",
+    "TOK_R_BRACKET:",
+    "TOK_COLON:    ",
+    "TOK_COMMA:    ",
+    "TOK_STRING:   ",
+    "TOK_NUMBER:   ",
+    "TOK_TRUE:     ",
+    "TOK_FALSE:    ",
+    "TOK_NULL:     ",
+};
+
 char *file_to_string(const char *filename) {
     FILE *f = fopen(filename, "r");
     if (!f) {
@@ -54,7 +68,7 @@ AList_t *tokenizer(const char *str) {
         token_t *tok;
 
         if (*str == '{') {
-            tok = alloc_token(BRACE_OPEN);
+            tok = alloc_token(TOK_L_BRACE);
             tok->character = *str;
             array_list_add(tokens, &tok);
             str++;
@@ -62,7 +76,7 @@ AList_t *tokenizer(const char *str) {
         }
 
         if (*str == '}') {
-            tok = alloc_token(BRACE_CLOSE);
+            tok = alloc_token(TOK_R_BRACE);
             tok->character = *str;
             array_list_add(tokens, &tok);
             str++;
@@ -70,7 +84,7 @@ AList_t *tokenizer(const char *str) {
         }
 
         if (*str == '[') {
-            tok = alloc_token(BRACKET_OPEN);
+            tok = alloc_token(TOK_L_BRACKET);
             tok->character = *str;
             array_list_add(tokens, &tok);
             str++;
@@ -78,7 +92,7 @@ AList_t *tokenizer(const char *str) {
         }
 
         if (*str == ']') {
-            tok = alloc_token(BRACKET_CLOSE);
+            tok = alloc_token(TOK_R_BRACKET);
             tok->character = *str;
             array_list_add(tokens, &tok);
             str++;
@@ -86,7 +100,7 @@ AList_t *tokenizer(const char *str) {
         }
 
         if (*str == ':') {
-            tok = alloc_token(COLON);
+            tok = alloc_token(TOK_COLON);
             tok->character = *str;
             array_list_add(tokens, &tok);
             str++;
@@ -94,29 +108,29 @@ AList_t *tokenizer(const char *str) {
         }
 
         if (*str == ',') {
-            tok = alloc_token(COMMA);
+            tok = alloc_token(TOK_COMMA);
             tok->character = *str;
             array_list_add(tokens, &tok);
             str++;
             continue;
         }
 
-        // Ignore whitespaces
+        /* Ignore whitespaces */
         if (*str == ' ' || *str == '\n' || *str == '\r' || *str == '\t') {
             str++;
             continue;
         }
 
-        // String
+        /* String */
         if (*str == '"') {
             str++; // Skip opening quotes
 
             // Calculate string length
             const char *start = str;
             while (*str != '"' && *str != '\0') str++;
-            const unsigned int length = str - start;
+            const size_t length = str - start;
 
-            tok = alloc_token(JSON_STRING);
+            tok = alloc_token(TOK_STRING);
             tok->string = strndup(start, length);
             array_list_add(tokens, &tok);
 
@@ -124,9 +138,9 @@ AList_t *tokenizer(const char *str) {
             continue;
         }
 
-        // Number
+        /* Number */
         if (isdigit(*str) || *str == '-') {
-            tok = alloc_token(JSON_NUMBER);
+            tok = alloc_token(TOK_NUMBER);
             char *end;
             tok->number = strtod(str, &end);
             array_list_add(tokens, &tok);
@@ -134,24 +148,24 @@ AList_t *tokenizer(const char *str) {
             continue;
         }
 
-        // Boolean
+        /* Boolean */
         if (!strncmp(str, "true", 4)) {
-            tok = alloc_token(JSON_BOOLEAN);
+            tok = alloc_token(TOK_TRUE);
             tok->boolean = true;
             array_list_add(tokens, &tok);
             str += 4;
             continue;
         } else if (!strncmp(str, "false", 5)) {
-            tok = alloc_token(JSON_BOOLEAN);
+            tok = alloc_token(TOK_FALSE);
             tok->boolean = false;
             array_list_add(tokens, &tok);
             str += 5;
             continue;
         }
 
-        // Null
+        /* Null */
         if (!strncmp(str, "null", 4)) {
-            tok = alloc_token(JSON_NULL);
+            tok = alloc_token(TOK_NULL);
             array_list_add(tokens, &tok);
             str += 4;
             continue;

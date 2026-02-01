@@ -3,16 +3,17 @@
 #include "array_list.h"
 
 typedef enum {
-    BRACE_OPEN,
-    BRACE_CLOSE,
-    BRACKET_OPEN,
-    BRACKET_CLOSE,
-    COLON,
-    COMMA,
-    JSON_STRING,
-    JSON_NUMBER,
-    JSON_BOOLEAN,
-    JSON_NULL,
+    TOK_L_BRACE,
+    TOK_R_BRACE,
+    TOK_L_BRACKET,
+    TOK_R_BRACKET,
+    TOK_COLON,
+    TOK_COMMA,
+    TOK_STRING,
+    TOK_NUMBER,
+    TOK_TRUE,
+    TOK_FALSE,
+    TOK_NULL,
 } TokenType;
 
 typedef struct Token {
@@ -25,6 +26,8 @@ typedef struct Token {
         double number;
     };
 } token_t;
+
+extern const char *tok_type_to_str[];
 
 char *file_to_string(const char *filename);
 
