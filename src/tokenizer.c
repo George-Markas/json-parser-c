@@ -2,6 +2,9 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+#include <ctype.h>
 
 char *file_to_string(const char *filename) {
     FILE *f = fopen(filename, "r");
@@ -14,23 +17,23 @@ char *file_to_string(const char *filename) {
     const long size = ftell(f);
     rewind(f);
 
-    char *buffer = malloc(size + 1);
-    if (!buffer) {
-        fprintf(stderr, "Memory allocation failed\n");
+    char *buf = malloc(size + 1);
+    if (!buf) {
+        fprintf(stderr, "Allocation failed\n");
         exit(EXIT_FAILURE);
     }
 
-    fread(buffer, 1, size, f);
-    buffer[size] = '\0';
+    fread(buf, 1, size, f);
+    buf[size] = '\0';
     fclose(f);
 
-    return buffer;
+    return buf;
 }
 
 static token_t *alloc_token(const TokenType type) {
     token_t *tok = malloc(sizeof(token_t));
     if (!tok) {
-        fprintf(stderr, "Memory allocation failed\n");
+        fprintf(stderr, "Allocation failed\n");
         exit(EXIT_FAILURE);
     }
     tok->type = type;
@@ -43,7 +46,7 @@ AList_t *tokenize(const char *str) {
 
     AList_t *tokens = array_list_new(sizeof(token_t *));
     if (!tokens) {
-        fprintf(stderr, "Could not create array list\n");
+        fprintf(stderr, "Allocation failed\n");
         exit(EXIT_FAILURE);
     }
 
@@ -104,26 +107,51 @@ AList_t *tokenize(const char *str) {
             continue;
         }
 
-        // if (*str == '"') {
-        //     str++; // Skip opening quote
-        //
-        //     // Calculate string length
-        //     const char *temp = str;
-        //     while (*str != '"' && *str != '\0') str++;
-        //     const unsigned int length = str - temp;
-        //
-        //     token_t *token = alloc_token(JSON_STRING);
-        //     token->string = malloc(sizeof(length + 1));
-        //     if (!token->string) {
-        //         fprintf(stderr, "Allocation failed\n");
-        //         exit(EXIT_FAILURE);
-        //     }
-        //
-        //     strlcpy(token->string, temp, length + 1);
-        //     array_list_add(tokens, token);
-        //     str++; // Skip closing quote
-        //     continue;
-        // }
+        if (*str == '"') {
+            str++; // Skip opening quotes
+
+            // Calculate string length
+            const char *start = str;
+            while (*str != '"' && *str != '\0') str++;
+            const unsigned int length = str - start;
+
+            tok = alloc_token(JSON_STRING);
+            tok->string = strndup(start, length);
+            array_list_add(tokens, &tok);
+
+            str++; // Skip closing quotes
+            continue;
+        }
+
+        if (isdigit(*str) || *str == '-') {
+            tok = alloc_token(JSON_NUMBER);
+            char *end;
+            tok->number = strtod(str, &end);
+            array_list_add(tokens, &tok);
+            str = end;
+            continue;
+        }
+
+        if (!strncmp(str, "true", 4)) {
+            tok = alloc_token(JSON_BOOLEAN);
+            tok->boolean = true;
+            array_list_add(tokens, &tok);
+            str += 4;
+            continue;
+        } else if (!strncmp(str, "false", 5)) {
+            tok = alloc_token(JSON_BOOLEAN);
+            tok->boolean = false;
+            array_list_add(tokens, &tok);
+            str += 5;
+            continue;
+        }
+
+        if (!strncmp(str, "null", 4)) {
+            tok = alloc_token(JSON_NULL);
+            array_list_add(tokens, &tok);
+            str += 4;
+            continue;
+        }
 
         fprintf(stderr, "Unexpected token '%s'\n", str);
 

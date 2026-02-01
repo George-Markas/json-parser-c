@@ -9,7 +9,10 @@ typedef enum {
     BRACKET_CLOSE,
     COLON,
     COMMA,
-    STRING
+    JSON_STRING,
+    JSON_NUMBER,
+    JSON_BOOLEAN,
+    JSON_NULL,
 } TokenType;
 
 typedef struct Token {
@@ -18,6 +21,8 @@ typedef struct Token {
     union {
         char character;
         char *string;
+        bool boolean;
+        double number;
     };
 } token_t;
 
