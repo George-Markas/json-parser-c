@@ -107,6 +107,7 @@ AList_t *tokenize(const char *str) {
             continue;
         }
 
+        // String
         if (*str == '"') {
             str++; // Skip opening quotes
 
@@ -123,6 +124,7 @@ AList_t *tokenize(const char *str) {
             continue;
         }
 
+        // Number
         if (isdigit(*str) || *str == '-') {
             tok = alloc_token(JSON_NUMBER);
             char *end;
@@ -132,6 +134,7 @@ AList_t *tokenize(const char *str) {
             continue;
         }
 
+        // Boolean
         if (!strncmp(str, "true", 4)) {
             tok = alloc_token(JSON_BOOLEAN);
             tok->boolean = true;
@@ -146,6 +149,7 @@ AList_t *tokenize(const char *str) {
             continue;
         }
 
+        // Null
         if (!strncmp(str, "null", 4)) {
             tok = alloc_token(JSON_NULL);
             array_list_add(tokens, &tok);
