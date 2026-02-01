@@ -28,4 +28,4 @@ typedef struct Token {
 
 char *file_to_string(const char *filename);
 
-AList_t *tokenize(const char *str);
+AList_t *tokenizer(const char *str);

@@ -8,7 +8,7 @@ void free_tokens(const AList_t *tokens);
 
 int main(void) {
     char *buf = file_to_string("../test.json");
-    AList_t *tokens = tokenize(buf);
+    AList_t *tokens = tokenizer(buf);
     free(buf); buf = NULL;
 
     print_tokens(tokens);
@@ -20,7 +20,7 @@ int main(void) {
 
 void print_tokens(const AList_t *tokens) {
     for (size_t i = 0; i < tokens->length; i++) {
-        const char *tok_type_to_str[] = {
+       const char *tok_type_to_str[] = {
             "\x1B[32mBRACE_OPEN:   \x1B[0m",
             "\x1B[32mBRACE_CLOSE:  \x1B[0m",
             "\x1B[32mBRACKET_OPEN: \x1B[0m",

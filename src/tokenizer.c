@@ -41,7 +41,7 @@ static token_t *alloc_token(const TokenType type) {
     return tok;
 }
 
-AList_t *tokenize(const char *str) {
+AList_t *tokenizer(const char *str) {
     if (!str) return NULL;
 
     AList_t *tokens = array_list_new(sizeof(token_t *));
