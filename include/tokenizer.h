@@ -18,13 +18,7 @@ typedef enum {
 
 typedef struct Token {
     TokenType type;
-
-    union {
-        char character;
-        char *string;
-        bool boolean;
-        double number;
-    };
+    char *string;
 } token_t;
 
 extern const char *tok_type_to_str[];

@@ -2,22 +2,21 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
 #include <ctype.h>
 
 const char *tok_type_to_str[] = {
-    "TOK_L_BRACE   ",
-    "TOK_R_BRACE   ",
-    "TOK_L_BRACKET:",
-    "TOK_R_BRACKET:",
-    "TOK_COLON:    ",
-    "TOK_COMMA:    ",
-    "TOK_STRING:   ",
-    "TOK_NUMBER:   ",
-    "TOK_TRUE:     ",
-    "TOK_FALSE:    ",
-    "TOK_NULL:     ",
+    "TOK_L_BRACE  ",
+    "TOK_R_BRACE  ",
+    "TOK_L_BRACKET",
+    "TOK_R_BRACKET",
+    "TOK_COLON    ",
+    "TOK_COMMA    ",
+    "TOK_STRING:  ",
+    "TOK_NUMBER:  ",
+    "TOK_TRUE     ",
+    "TOK_FALSE    ",
+    "TOK_NULL     ",
 };
 
 char *file_to_string(const char *filename) {
@@ -51,6 +50,7 @@ static token_t *alloc_token(const TokenType type) {
         exit(EXIT_FAILURE);
     }
     tok->type = type;
+    tok->string = NULL;
 
     return tok;
 }
@@ -69,7 +69,6 @@ AList_t *tokenizer(const char *str) {
 
         if (*str == '{') {
             tok = alloc_token(TOK_L_BRACE);
-            tok->character = *str;
             array_list_add(tokens, &tok);
             str++;
             continue;
@@ -77,7 +76,6 @@ AList_t *tokenizer(const char *str) {
 
         if (*str == '}') {
             tok = alloc_token(TOK_R_BRACE);
-            tok->character = *str;
             array_list_add(tokens, &tok);
             str++;
             continue;
@@ -85,7 +83,6 @@ AList_t *tokenizer(const char *str) {
 
         if (*str == '[') {
             tok = alloc_token(TOK_L_BRACKET);
-            tok->character = *str;
             array_list_add(tokens, &tok);
             str++;
             continue;
@@ -93,7 +90,6 @@ AList_t *tokenizer(const char *str) {
 
         if (*str == ']') {
             tok = alloc_token(TOK_R_BRACKET);
-            tok->character = *str;
             array_list_add(tokens, &tok);
             str++;
             continue;
@@ -101,7 +97,6 @@ AList_t *tokenizer(const char *str) {
 
         if (*str == ':') {
             tok = alloc_token(TOK_COLON);
-            tok->character = *str;
             array_list_add(tokens, &tok);
             str++;
             continue;
@@ -109,7 +104,6 @@ AList_t *tokenizer(const char *str) {
 
         if (*str == ',') {
             tok = alloc_token(TOK_COMMA);
-            tok->character = *str;
             array_list_add(tokens, &tok);
             str++;
             continue;
@@ -140,24 +134,28 @@ AList_t *tokenizer(const char *str) {
 
         /* Number */
         if (isdigit(*str) || *str == '-') {
+
+            // Calculate the number's length in digits
+            const char *start = str;
+            if (*str == '-') str++; // Skip sign
+            while (isdigit(*str) || *str == '.' || *str == 'e' || *str == 'E' ||
+                *str == '+' || *str == '-') str++;
+            const size_t length = str - start;
+
             tok = alloc_token(TOK_NUMBER);
-            char *end;
-            tok->number = strtod(str, &end);
+            tok->string = strndup(start, length);
             array_list_add(tokens, &tok);
-            str = end;
             continue;
         }
 
         /* Boolean */
         if (!strncmp(str, "true", 4)) {
             tok = alloc_token(TOK_TRUE);
-            tok->boolean = true;
             array_list_add(tokens, &tok);
             str += 4;
             continue;
         } else if (!strncmp(str, "false", 5)) {
             tok = alloc_token(TOK_FALSE);
-            tok->boolean = false;
             array_list_add(tokens, &tok);
             str += 5;
             continue;
