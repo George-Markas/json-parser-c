@@ -14,14 +14,15 @@ typedef enum {
     TOK_TRUE,
     TOK_FALSE,
     TOK_NULL,
-} TokenType;
+} Token_Type;
 
 typedef struct Token {
-    TokenType type;
+    Token_Type type;
     char *str;
 } token_t;
 
-extern const char *tok_type_to_str[];
+// Convenient array lookup to get the token type as a string
+extern const char *token_type_to_str[];
 
 /**
  * @brief Load the contents of a text file into a string.
@@ -32,8 +33,14 @@ extern const char *tok_type_to_str[];
 char *file_to_string(const char *filename);
 
 /**
- * @brief Breaks up the provided string into JSON tokens.
+ * @brief Break up the provided string into JSON tokens.
  * @param str The string of the text to be tokenized.
  * @return an array list containing the tokens.
  */
 AList_t *tokenizer(const char *str);
+
+/**
+ * @brief Free any allocated tokens and the array list that contains them.
+ * @param tokens The array list containing the tokens.
+ */
+void free_tokens(AList_t *tokens);

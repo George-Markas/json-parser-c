@@ -10,10 +10,10 @@ typedef enum {
     JSON_NUMBER,
     JSON_BOOLEAN,
     JSON_NULL
-} JsonValueType;
+} Json_Value_Type;
 
 typedef struct JsonValue {
-    JsonValueType type;
+    Json_Value_Type type;
 
     union {
         struct {
@@ -31,4 +31,4 @@ typedef struct JsonValue {
         double number;
         bool boolean;
     };
-} json_val_t;
+} json_value_t;

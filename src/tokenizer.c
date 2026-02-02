@@ -1,11 +1,10 @@
 #include "tokenizer.h"
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 
-const char *tok_type_to_str[] = {
+const char *token_type_to_str[] = {
     "TOK_L_BRACE  ",
     "TOK_R_BRACE  ",
     "TOK_L_BRACKET",
@@ -30,29 +29,43 @@ char *file_to_string(const char *filename) {
     const long size = ftell(f);
     rewind(f);
 
-    char *buf = malloc(size + 1);
-    if (!buf) {
+    char *buffer = malloc(size + 1);
+    if (!buffer) {
         fprintf(stderr, "Allocation failed\n");
         exit(EXIT_FAILURE);
     }
 
-    fread(buf, 1, size, f);
-    buf[size] = '\0';
+    fread(buffer, 1, size, f);
+    buffer[size] = '\0';
     fclose(f);
 
-    return buf;
+    return buffer;
 }
 
-static token_t *alloc_token(const TokenType type) {
-    token_t *tok = malloc(sizeof(token_t));
-    if (!tok) {
+static token_t *alloc_token(const Token_Type type) {
+    token_t *token = malloc(sizeof(token_t));
+    if (!token) {
         fprintf(stderr, "Allocation failed\n");
         exit(EXIT_FAILURE);
     }
-    tok->type = type;
-    tok->str = NULL;
+    token->type = type;
+    token->str = NULL;
 
-    return tok;
+    return token;
+}
+
+void free_tokens(AList_t *tokens) {
+    if (!tokens) return;
+    for (size_t i = 0; i < tokens->length; i++) {
+        token_t *token = *(token_t **) array_list_get(tokens, i);
+        if (token->str) {
+            free(token->str); token->str = NULL;
+        }
+
+        free(token); token = NULL;
+    }
+
+    array_list_delete(tokens);
 }
 
 AList_t *tokenizer(const char *str) {
@@ -65,46 +78,46 @@ AList_t *tokenizer(const char *str) {
     }
 
     while (*str != '\0') {
-        token_t *tok;
+        token_t *token;
 
         if (*str == '{') {
-            tok = alloc_token(TOK_L_BRACE);
-            array_list_add(tokens, &tok);
+            token = alloc_token(TOK_L_BRACE);
+            array_list_add(tokens, &token);
             str++;
             continue;
         }
 
         if (*str == '}') {
-            tok = alloc_token(TOK_R_BRACE);
-            array_list_add(tokens, &tok);
+            token = alloc_token(TOK_R_BRACE);
+            array_list_add(tokens, &token);
             str++;
             continue;
         }
 
         if (*str == '[') {
-            tok = alloc_token(TOK_L_BRACKET);
-            array_list_add(tokens, &tok);
+            token = alloc_token(TOK_L_BRACKET);
+            array_list_add(tokens, &token);
             str++;
             continue;
         }
 
         if (*str == ']') {
-            tok = alloc_token(TOK_R_BRACKET);
-            array_list_add(tokens, &tok);
+            token = alloc_token(TOK_R_BRACKET);
+            array_list_add(tokens, &token);
             str++;
             continue;
         }
 
         if (*str == ':') {
-            tok = alloc_token(TOK_COLON);
-            array_list_add(tokens, &tok);
+            token = alloc_token(TOK_COLON);
+            array_list_add(tokens, &token);
             str++;
             continue;
         }
 
         if (*str == ',') {
-            tok = alloc_token(TOK_COMMA);
-            array_list_add(tokens, &tok);
+            token = alloc_token(TOK_COMMA);
+            array_list_add(tokens, &token);
             str++;
             continue;
         }
@@ -124,9 +137,9 @@ AList_t *tokenizer(const char *str) {
             while (*str != '"' && *str != '\0') str++;
             const size_t length = str - start;
 
-            tok = alloc_token(TOK_STRING);
-            tok->str = strndup(start, length);
-            array_list_add(tokens, &tok);
+            token = alloc_token(TOK_STRING);
+            token->str = strndup(start, length);
+            array_list_add(tokens, &token);
 
             str++; // Skip closing quotes
             continue;
@@ -134,42 +147,44 @@ AList_t *tokenizer(const char *str) {
 
         /* Number */
         if (isdigit(*str) || *str == '-') {
-
             // Calculate the number's length in digits
             const char *start = str;
             if (*str == '-') str++; // Skip sign
             while (isdigit(*str) || *str == '.' || *str == 'e' || *str == 'E' ||
-                *str == '+' || *str == '-') str++;
+                   *str == '+' || *str == '-')
+                str++;
             const size_t length = str - start;
 
-            tok = alloc_token(TOK_NUMBER);
-            tok->str = strndup(start, length);
-            array_list_add(tokens, &tok);
+            token = alloc_token(TOK_NUMBER);
+            token->str = strndup(start, length);
+            array_list_add(tokens, &token);
             continue;
         }
 
         /* Boolean */
         if (!strncmp(str, "true", 4)) {
-            tok = alloc_token(TOK_TRUE);
-            array_list_add(tokens, &tok);
+            token = alloc_token(TOK_TRUE);
+            array_list_add(tokens, &token);
             str += 4;
             continue;
         } else if (!strncmp(str, "false", 5)) {
-            tok = alloc_token(TOK_FALSE);
-            array_list_add(tokens, &tok);
+            token = alloc_token(TOK_FALSE);
+            array_list_add(tokens, &token);
             str += 5;
             continue;
         }
 
         /* Null */
         if (!strncmp(str, "null", 4)) {
-            tok = alloc_token(TOK_NULL);
-            array_list_add(tokens, &tok);
+            token = alloc_token(TOK_NULL);
+            array_list_add(tokens, &token);
             str += 4;
             continue;
         }
 
+        // On error, fail and clean up any allocations
         fprintf(stderr, "Unexpected token '%s'\n", str);
+        free_tokens(tokens);
 
         return NULL;
     }
