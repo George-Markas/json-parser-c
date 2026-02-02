@@ -35,7 +35,7 @@ char *file_to_string(const char *filename);
 /**
  * @brief Break up the provided string into JSON tokens.
  * @param str The string of the text to be tokenized.
- * @return an array list containing the tokens.
+ * @return An array list containing the tokens.
  */
 AList_t *tokenizer(const char *str);
 
