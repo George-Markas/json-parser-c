@@ -18,7 +18,7 @@ typedef enum {
 
 typedef struct Token {
     TokenType type;
-    char *string;
+    char *str;
 } token_t;
 
 extern const char *tok_type_to_str[];

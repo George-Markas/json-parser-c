@@ -21,8 +21,8 @@ int main(void) {
 void print_tokens(const AList_t *tokens) {
     for (size_t i = 0; i < tokens->length; i++) {
         const token_t *tok = *(token_t **) array_list_get(tokens, i);
-        if (tok->string) {
-            printf("\x1B[32m%s\x1B[0m %s\n", tok_type_to_str[tok->type], tok->string);
+        if (tok->str) {
+            printf("\x1B[32m%s\x1B[0m %s\n", tok_type_to_str[tok->type], tok->str);
         } else {
             printf("\x1B[32m%s\x1B[0m\n", tok_type_to_str[tok->type]);
         }
@@ -32,8 +32,8 @@ void print_tokens(const AList_t *tokens) {
 void free_tokens(const AList_t *tokens) {
     for (size_t i = 0; i < tokens->length; i++) {
         token_t *tok = *(token_t **) array_list_get(tokens, i);
-        if (tok->string) {
-            free(tok->string); tok->string = NULL;
+        if (tok->str) {
+            free(tok->str); tok->str = NULL;
         }
 
         free(tok); tok = NULL;

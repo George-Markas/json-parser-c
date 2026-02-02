@@ -50,7 +50,7 @@ static token_t *alloc_token(const TokenType type) {
         exit(EXIT_FAILURE);
     }
     tok->type = type;
-    tok->string = NULL;
+    tok->str = NULL;
 
     return tok;
 }
@@ -125,7 +125,7 @@ AList_t *tokenizer(const char *str) {
             const size_t length = str - start;
 
             tok = alloc_token(TOK_STRING);
-            tok->string = strndup(start, length);
+            tok->str = strndup(start, length);
             array_list_add(tokens, &tok);
 
             str++; // Skip closing quotes
@@ -143,7 +143,7 @@ AList_t *tokenizer(const char *str) {
             const size_t length = str - start;
 
             tok = alloc_token(TOK_NUMBER);
-            tok->string = strndup(start, length);
+            tok->str = strndup(start, length);
             array_list_add(tokens, &tok);
             continue;
         }
