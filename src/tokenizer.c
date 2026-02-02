@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include <ctype.h>
 
 const char *token_type_to_str[] = {
@@ -30,10 +31,7 @@ char *file_to_string(const char *filename) {
     rewind(f);
 
     char *buffer = malloc(size + 1);
-    if (!buffer) {
-        fprintf(stderr, "Allocation failed\n");
-        exit(EXIT_FAILURE);
-    }
+    assert(buffer);
 
     fread(buffer, 1, size, f);
     buffer[size] = '\0';
@@ -44,10 +42,7 @@ char *file_to_string(const char *filename) {
 
 static token_t *alloc_token(const Token_Type type) {
     token_t *token = malloc(sizeof(token_t));
-    if (!token) {
-        fprintf(stderr, "Allocation failed\n");
-        exit(EXIT_FAILURE);
-    }
+    assert(token);
     token->type = type;
     token->str = NULL;
 
@@ -72,10 +67,7 @@ AList_t *tokenizer(const char *str) {
     if (!str) return NULL;
 
     AList_t *tokens = array_list_new(sizeof(token_t *));
-    if (!tokens) {
-        fprintf(stderr, "Allocation failed\n");
-        exit(EXIT_FAILURE);
-    }
+    assert(tokens);
 
     while (*str != '\0') {
         token_t *token;
@@ -182,9 +174,8 @@ AList_t *tokenizer(const char *str) {
             continue;
         }
 
-        // On error, fail and clean up any allocations
+        // On error, fail
         fprintf(stderr, "Unexpected token '%s'\n", str);
-        free_tokens(tokens);
 
         return NULL;
     }

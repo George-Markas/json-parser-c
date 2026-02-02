@@ -12,18 +12,22 @@ typedef enum {
     JSON_NULL
 } Json_Value_Type;
 
-typedef struct JsonValue {
+struct Json_Object_Element {
+    char *key;
+    struct Json_Value *value;
+};
+
+typedef struct Json_Value {
     Json_Value_Type type;
 
     union {
         struct {
-            char **keys;
-            struct JsonValue **values;
+            struct Json_Object_Element **elements;
             size_t count;
         } object;
 
         struct {
-            struct JsonValue **elements;
+            struct Json_Value **elements;
             size_t count;
         } array;
 
