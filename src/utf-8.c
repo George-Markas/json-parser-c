@@ -19,7 +19,7 @@ static bool u8_is_valid(const u8char_t ch) {
     // U+0000 - U+007F
     if (ch <= 0x7F) return true;
 
-    // Validate U+0080 - U+07FF
+    // U+0080 - U+07FF
     if (0xC280 <= ch && ch <= 0xDFBF) return (ch & 0xE0C0) == 0xC080;
 
     // Reject UTF-16 surrogates
