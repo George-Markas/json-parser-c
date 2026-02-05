@@ -107,4 +107,21 @@ void u8_info(const u8char_t ch) {
            "Glyph:             '%s'\n\n",
            u8_decode(ch), ch, bytes);
 }
+
+void u8_print_string(const char *str) {
+    u8char_t ch;
+    int length;
+    const char *temp = str;
+
+    while ((length = u8_next(temp, &ch))) {
+        char bytes[5] = {0};
+        for (int i = 0; i < length; i++) {
+            bytes[i] = (char)((ch >> (8 * (length - 1 - i))) & 0xFF);
+        }
+
+        printf("%s", bytes);
+        temp += length;
+    }
+    putchar('\n');
+}
 #endif
