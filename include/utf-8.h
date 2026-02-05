@@ -12,4 +12,6 @@ uint32_t u8_decode(u8char_t ch);
 
 #ifndef NDEBUG
 void u8_info(u8char_t ch);
+
+void u8_print_string(const char *str);
 #endif
