@@ -1,32 +1,33 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "tokenizer.h"
+#include "lexer.h"
+#include "utf-8.h"
 
-void print_tokens(const AList_t *tokens);
+#define TEST_FILE "../tests/text.txt"
+
+void print_u8_string(const char *str);
 
 int main(void) {
-    char *buffer = file_to_string("../test.json");
-    AList_t *tokens = tokenizer(buffer);
-    free(buffer); buffer = NULL;
+    const char *str = file_to_string(TEST_FILE);
+    print_u8_string(str);
+    free((void *) str);
 
-    print_tokens(tokens);
-
-    free_tokens(tokens);
     return 0;
 }
 
-void print_tokens(const AList_t *tokens) {
-    if (!tokens) {
-        printf("No tokens to print\n");
-        return;
-    }
+void print_u8_string(const char *str) {
+    u8char_t ch;
+    int length;
+    const char *temp = str;
 
-    for (size_t i = 0; i < tokens->length; i++) {
-        const token_t *token = *(token_t **) array_list_get(tokens, i);
-        if (token->str) {
-            printf("\x1B[32m%s\x1B[0m%s\n", token_type_to_str[token->type], token->str);
-        } else {
-            printf("\x1B[32m%s\x1B[0m\n", token_type_to_str[token->type]);
+    while ((length = u8_next(temp, &ch))) {
+        char bytes[5] = {0};
+        for (int i = 0; i < length; i++) {
+            bytes[i] = (char)((ch >> (8 * (length - 1 - i))) & 0xFF);
         }
+
+        printf("%s", bytes);
+        temp += length;
     }
+    putchar('\n');
 }
