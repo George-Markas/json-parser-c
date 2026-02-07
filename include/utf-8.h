@@ -10,8 +10,8 @@ u8char_t u8_encode(uint32_t codepoint);
 
 uint32_t u8_decode(u8char_t ch);
 
+int register_uchar8_t_printf(void);
+
 #ifndef NDEBUG
 void u8_info(u8char_t ch);
-
-void u8_print_string(const char *str);
 #endif
