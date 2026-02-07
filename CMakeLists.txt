@@ -23,6 +23,8 @@ add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 target_compile_options(${PROJECT_NAME}
         PRIVATE -Wall
         PRIVATE -Wextra
+        PRIVATE -Wno-format
+        PRIVATE -Wno-format-extra-args
 )
 
 target_include_directories(${PROJECT_NAME}

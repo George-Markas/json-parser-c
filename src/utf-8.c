@@ -1,10 +1,8 @@
 #include "utf-8.h"
+#include <stdio.h>
 #include <stdbool.h>
 #include <errno.h>
-
-#ifndef NDEBUG
-#include <stdio.h>
-#endif
+#include <printf.h>
 
 #define U8_LENGTH(str) u8_length[(((uint8_t *)(str))[0] & 0xFF) >> 4]
 
@@ -88,6 +86,39 @@ uint32_t u8_decode(u8char_t ch) {
     return ch;
 }
 
+static int print_u8char_t(FILE *stream, __attribute__((unused)) const struct printf_info *info,
+                          const void *const *args) {
+
+    const u8char_t ch = *((const u8char_t *) args[0]);
+
+    int length;
+    if ((ch >> 24) & 0xFF) length = 4;
+    else if ((ch >> 16) & 0xFF) length = 3;
+    else if ((ch >> 8) & 0xFF) length = 2;
+    else length = 1;
+
+    char bytes[5] = {0};
+    for (int i = 0; i < length; i++) {
+        bytes[i] = (char) ((ch >> (8 * (length - 1 - i))) & 0xFF);
+    }
+
+    fprintf(stream, "%s", bytes);
+
+    return length;
+}
+
+static int print_u8char_t_arginfo(__attribute__((unused)) const struct printf_info *info,
+                                  const size_t n, int *argtypes,
+                                  __attribute__((unused)) int *size) {
+
+    if (n) argtypes[0] = PA_POINTER;
+    return 1;
+}
+
+int register_uchar8_t_printf(void) {
+    return register_printf_specifier('U', print_u8char_t, print_u8char_t_arginfo);
+}
+
 #ifndef NDEBUG
 void u8_info(const u8char_t ch) {
     int length;
@@ -106,22 +137,5 @@ void u8_info(const u8char_t ch) {
            "Unicode codepoint: U+%04X\n"
            "Glyph:             '%s'\n\n",
            u8_decode(ch), ch, bytes);
-}
-
-void u8_print_string(const char *str) {
-    u8char_t ch;
-    int length;
-    const char *temp = str;
-
-    while ((length = u8_next(temp, &ch))) {
-        char bytes[5] = {0};
-        for (int i = 0; i < length; i++) {
-            bytes[i] = (char)((ch >> (8 * (length - 1 - i))) & 0xFF);
-        }
-
-        printf("%s", bytes);
-        temp += length;
-    }
-    putchar('\n');
 }
 #endif
