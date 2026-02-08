@@ -13,12 +13,12 @@ typedef struct ArrayList {
     void *data;
     size_t length; // Current number of elements
     size_t capacity; // Max number of elements
-    size_t element_size; // The byte size an element
+    size_t element_size; // Element byte size
 } AList_t;
 
 /**
  * @brief Create an array list.
- * @param element_size The byte size of a single element.
+ * @param element_size The element byte size.
  * @return Pointer to new the array list or NULL on error.
  */
 AList_t *array_list_new(size_t element_size);
@@ -26,10 +26,10 @@ AList_t *array_list_new(size_t element_size);
 /**
  * @brief Append a value to an array list.
  * @param array_list The array list to append to.
- * @param val Value to append.
+ * @param value Value to append.
  * @return True if the array list was modified, false if it wasn't.
  */
-bool array_list_add(AList_t *array_list, const void *val);
+bool array_list_add(AList_t *array_list, const void *value);
 
 /**
  * @brief Access a value at a specific index of an array list.
@@ -44,10 +44,10 @@ void *array_list_get(const AList_t *array_list, size_t index);
  * This will overwrite existing values.
  * @param array_list The array list to write to.
  * @param index The index to write at.
- * @param val The value to write.
+ * @param value The value to write.
  * @return True if the array list was modified, false if it wasn't.
  */
-bool array_list_set(const AList_t *array_list, size_t index, const void *val);
+bool array_list_set(const AList_t *array_list, size_t index, const void *value);
 
 /**
  * @brief Remove a value from an array list.

@@ -16,7 +16,7 @@ all: $(TARGET)
 debug: CFLAGS += -g
 debug: all
 
-.PHONY: all clean
+.PHONY: debug all clean
 
 $(BUILD_DIR):
 	@mkdir -p $@

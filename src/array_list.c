@@ -1,4 +1,4 @@
-#include "../include/array_list.h"
+#include "array_list.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,7 +7,7 @@ AList_t *array_list_new(size_t element_size) {
     AList_t *new_array_list = malloc(sizeof(AList_t));
     if (element_size < 1) element_size = 1;
     new_array_list->data = malloc(INITIAL_CAPACITY * element_size);
-    if (new_array_list->data == NULL) {
+    if (!new_array_list->data) {
         FREE(new_array_list);
         return NULL;
     }
@@ -19,47 +19,46 @@ AList_t *array_list_new(size_t element_size) {
     return new_array_list;
 }
 
-bool array_list_add(AList_t *array_list, const void *val) {
-    if (array_list == NULL) return false;
+bool array_list_add(AList_t *array_list, const void *value) {
+    if (!array_list) return false;
 
     // If occupancy reaches max capacity, double the max capacity
     if (array_list->length + 1 > array_list->capacity) {
         void *new_ptr = realloc(array_list->data, BYTE_CAPACITY * 2);
-        if (new_ptr == NULL) return false;
+        if (!new_ptr) return false;
         array_list->data = new_ptr;
         array_list->capacity *= 2;
     }
 
-    memcpy(LENGTH_OFFSET, val, array_list->element_size);
+    memcpy(LENGTH_OFFSET, value, array_list->element_size);
     array_list->length++;
 
     return true;
 }
 
 void *array_list_get(const AList_t *array_list, const size_t index) {
-    if (array_list == NULL) return NULL;
+    if (!array_list) return NULL;
     if (index >= array_list->length) return NULL;
 
     return INDEX_OFFSET(index);
 }
 
-bool array_list_set(const AList_t *array_list, const size_t index,
-                    const void *val) {
-    if (array_list == NULL) return false;
+bool array_list_set(const AList_t *array_list, const size_t index, const void *value) {
+    if (!array_list) return false;
     if (index >= array_list->length) return false;
-    memcpy(INDEX_OFFSET(index), val, array_list->element_size);
+    memcpy(INDEX_OFFSET(index), value, array_list->element_size);
 
     return true;
 }
 
 bool array_list_remove(AList_t *array_list) {
-    if (array_list == NULL) return false;
+    if (!array_list) return false;
     if (array_list->length < 1) return false;
 
     // If occupancy is a quarter or less of max capacity, halve the max capacity
     if (array_list->length - 1 <= array_list->capacity / 4) {
         void *new_ptr = realloc(array_list->data, BYTE_CAPACITY / 2);
-        if (new_ptr == NULL) return false;
+        if (!new_ptr) return false;
         array_list->data = new_ptr;
         array_list->capacity /= 2;
     }
@@ -70,7 +69,7 @@ bool array_list_remove(AList_t *array_list) {
 }
 
 void array_list_delete(AList_t *array_list) {
-    if (array_list == NULL) return;
+    if (!array_list) return;
     FREE(array_list->data);
     FREE(array_list);
 }
