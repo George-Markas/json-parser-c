@@ -34,7 +34,11 @@ char *file_to_string(const char *filename) {
     char *buffer = malloc(size + 1);
     assert(buffer);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
     fread(buffer, 1, size, f);
+#pragma GCC diagnostic pop
+
     buffer[size] = '\0';
     fclose(f);
 
