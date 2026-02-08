@@ -83,6 +83,7 @@ AList_t *tokenize(const char *str) {
                 str++; // Skip closing quotes
                 break;
             }
+            
             default:
                 /* Number */
                 if (isdigit(ch) || ch == '-') {
