@@ -1,0 +1,8 @@
+{
+    "string": "In the Land of Mordor where the Shadows lie."
+    "integer": [42, -1, 0],
+    "decimal": [3.14, -0.5, 123.456],
+    "scientific": [1e10, 1.5e-3, 2E+5],
+    "boolean": [true, false],
+    "null": null
+}

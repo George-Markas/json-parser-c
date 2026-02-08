@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <assert.h>
 
 const char *token_type_to_str[] = {
@@ -57,7 +58,7 @@ AList_t *tokenize(const char *str) {
             case '\t':
             case '\n':
             case '\r':
-                str++; // Skip whitespaces
+                str++; // Ignore whitespaces
                 continue;
             case '{': token.type = TOK_L_BRACE; break;
             case '}': token.type = TOK_R_BRACE; break;
@@ -65,7 +66,8 @@ AList_t *tokenize(const char *str) {
             case ']': token.type = TOK_R_BRACKET; break;
             case ':': token.type = TOK_COLON; break;
             case ',': token.type = TOK_COMMA; break;
-            case '"':
+            /* String */
+            case '"': {
                 str++; // Skip opening quotes
 
                 const char *start = str;
@@ -80,8 +82,48 @@ AList_t *tokenize(const char *str) {
 
                 str++; // Skip closing quotes
                 break;
+            }
+
             default:
-                fprintf(stderr, "Unexpected token: %U \n", ch);
+                /* Number */
+                if (isdigit(ch) || ch == '-') {
+                    const char *start = str;
+                    if (ch == '-') str++; // Skip sign
+                    while (u8_next(str, &ch) && (isdigit(ch) || ch == '.' ||
+                        ch == 'e' || ch == 'E' ||
+                        ch == '+' || ch == '-')) str++;
+                    const size_t string_length = str - start;
+
+                    token.type = TOK_NUMBER;
+                    token.str = malloc(string_length + 1);
+                    assert(token.str);
+                    memcpy(token.str, start, string_length);
+                    token.str[string_length] = '\0';
+                    break;
+                }
+
+                /* True */
+                if (!strncmp(str, "true", 4)) {
+                    token.type = TOK_TRUE;
+                    str += 4;
+                    break;
+                }
+
+                /* False */
+                if (!strncmp(str, "false", 5)) {
+                    token.type = TOK_FALSE;
+                    str += 5;
+                    break;
+                }
+
+                /* Null */
+                if (!strncmp(str, "null", 4)) {
+                    token.type = TOK_NULL;
+                    str += 4;
+                    break;
+                }
+
+                fprintf(stderr, "Unexpected token: '%s'\n", str);
                 return NULL;
         }
 
