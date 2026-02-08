@@ -1,23 +1,21 @@
-#include <printf.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include "lexer.h"
 #include "utf-8.h"
+#include "tokenizer.h"
+#include "parser.h"
 
-#define TEST_FILE "../tests/text.txt"
+#ifndef NDEBUG
+#define TEST_TEXT "../tests/text.txt"
+#define TEST_JSON "../tests/simple_json.txt"
+#define TEST_U8_JSON "../tests/utf-8_json.txt"
+#endif
 
 int main(void) {
     register_uchar8_t_printf();
 
-    const char *u1 = file_to_string(TEST_FILE);
-    printf("%s\n", u1);
-    free((void *) u1);
+    const char *str = file_to_string(TEST_U8_JSON);
+    parse(str);
 
-    const char *u2 = "💘";
-    u8char_t ch;
-    u8_next(u2, &ch);
-
-    printf("Through custom specifier: %U\n", ch);
+    free((void *) str);
 
     return EXIT_SUCCESS;
 }

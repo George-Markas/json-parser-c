@@ -7,12 +7,16 @@ set(CMAKE_C_STANDARD 11)
 set(SOURCES
         main.c
         utf-8.c
-        lexer.c
+        array_list.c
+        tokenizer.c
+        parser.c
 )
 
 set(HEADERS
         utf-8.h
-        lexer.h
+        array_list.h
+        tokenizer.h
+        parser.h
 )
 
 list(TRANSFORM SOURCES PREPEND "src/")
