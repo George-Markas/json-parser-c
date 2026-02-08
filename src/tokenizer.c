@@ -66,6 +66,7 @@ AList_t *tokenize(const char *str) {
             case ']': token.type = TOK_R_BRACKET; break;
             case ':': token.type = TOK_COLON; break;
             case ',': token.type = TOK_COMMA; break;
+
             /* String */
             case '"': {
                 str++; // Skip opening quotes
