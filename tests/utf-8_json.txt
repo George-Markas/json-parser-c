@@ -1,0 +1,4 @@
+{
+    "party_popper": "🎉",
+    "rocket": "🚀"
+}

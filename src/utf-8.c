@@ -86,6 +86,7 @@ uint32_t u8_decode(u8char_t ch) {
     return ch;
 }
 
+#ifdef __GLIBC__
 static int print_u8char_t(FILE *stream, __attribute__((unused)) const struct printf_info *info,
                           const void *const *args) {
 
@@ -118,6 +119,7 @@ static int print_u8char_t_arginfo(__attribute__((unused)) const struct printf_in
 int register_uchar8_t_printf(void) {
     return register_printf_specifier('U', print_u8char_t, print_u8char_t_arginfo);
 }
+#endif
 
 #ifndef NDEBUG
 void u8_info(const u8char_t ch) {
