@@ -35,7 +35,7 @@ char *file_to_string(const char *filename) {
     char *buffer = malloc(size + 1);
     assert(buffer);
 
-    fread(buffer, 1, size, f);
+    __attribute__((unused)) int read = (int) fread(buffer, 1, size, f);
 
     buffer[size] = '\0';
     fclose(f);

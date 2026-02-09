@@ -9,7 +9,7 @@ INC := $(addprefix -I, $(INC_DIR))
 OBJ := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRC))
 
 CC := gcc
-CFLAGS := -std=c11 -Wall -Wextra -O2
+CFLAGS := -std=gnu11 -Wall -Wextra -O2
 
 all: $(TARGET)
 
@@ -22,10 +22,10 @@ $(BUILD_DIR):
 	@mkdir -p $@
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
-	@$(CC) $(CFLAGS) -c $< $(INC) -o $@
+	@$(CC) $(CFLAGS) -c $< $(INC) -o $@ 
 
 $(TARGET): $(OBJ)
-	@$(CC) $^ -o $@
+	@$(CC) $^ -o $@ -lbsd
 	@echo "-> $@"
 
 clean:
