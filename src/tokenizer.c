@@ -24,7 +24,7 @@ const char *token_type_to_str[] = {
 char *file_to_string(const char *filename) {
     FILE *f = fopen(filename, "r");
     if (!f) {
-        fprintf(stderr, "Could not open file '%s'\n", filename);
+        ERROR("Could not open file '%s'", filename);
         exit(EXIT_FAILURE);
     }
 
@@ -126,7 +126,7 @@ AList_t *tokenize(const char *str) {
                     break;
                 }
 
-                ERROR("Unexpected token");
+                ERROR("Unexpected token '%s'", str);
                 return NULL;
         }
 

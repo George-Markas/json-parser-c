@@ -2,7 +2,9 @@
 #include "ansi.h"
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <stdbool.h>
+#include <stdarg.h>
 #include <string.h>
 
 static uint8_t int_length(const unsigned int num) {
@@ -46,7 +48,27 @@ static int string_to_int(int num, char *buffer, const int size) {
     return length + 1;
 }
 
-void error(const char *file, const int line,  const char *error_msg, ...) {
+void error(const char *file, const int line,  const char *error_message, ...) {
+    va_list args;
+
+    va_start(args, error_message);
+    const int size = vsnprintf(NULL, 0, error_message, args);
+    va_end(args);
+    if (!size) {
+        fprintf(stderr, "vsnprintf error\n");
+        return;
+    }
+
+    char *formatted_message = malloc(size + 1);
+    if (!formatted_message) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return;
+    }
+
+    va_start(args, error_message);
+    vsnprintf(formatted_message, size + 1, error_message, args);
+    va_end(args);
+
     char prefix[MAX_LENGTH] = RED(BOLD)"error "RESET;
 
     if (file) {
@@ -64,5 +86,7 @@ void error(const char *file, const int line,  const char *error_msg, ...) {
     }
 
     strlcat(prefix, ":", MAX_LENGTH);
-    fprintf(stderr, "%s %s\n", prefix, error_msg);
+    fprintf(stderr, "%s %s\n", prefix, formatted_message);
+
+    free(formatted_message);
 }
