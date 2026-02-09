@@ -1,5 +1,6 @@
 #include "tokenizer.h"
 #include "utf-8.h"
+#include "error.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,10 +35,7 @@ char *file_to_string(const char *filename) {
     char *buffer = malloc(size + 1);
     assert(buffer);
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-result"
     fread(buffer, 1, size, f);
-#pragma GCC diagnostic pop
 
     buffer[size] = '\0';
     fclose(f);
@@ -128,7 +126,7 @@ AList_t *tokenize(const char *str) {
                     break;
                 }
 
-                fprintf(stderr, "Unexpected token: '%s'\n", str);
+                ERROR("Unexpected token");
                 return NULL;
         }
 
