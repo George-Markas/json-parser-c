@@ -9,7 +9,7 @@ INC := $(addprefix -I, $(INC_DIR))
 OBJ := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRC))
 
 CC := gcc
-CFLAGS := -std=gnu11 -Wall -Wextra -O2
+CFLAGS := -std=gnu11 -O2 -Wall -Wextra -Werror
 
 all: $(TARGET)
 

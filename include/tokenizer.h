@@ -16,8 +16,7 @@ typedef enum {
     TOK_NULL
 } Token_Type;
 
-// Convenient array lookup to get the token type as a string
-extern const char *token_type_to_str[];
+extern const char *token_type_map[];
 
 typedef struct Token {
     Token_Type type;
