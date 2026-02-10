@@ -2,10 +2,10 @@
 #include "tokenizer.h"
 #include "ansi.h"
 #include <stdio.h>
-#include <assert.h>
 #include <stdlib.h>
+#include <assert.h>
 
-void parse(const char *filename) {
+void dummy_parse(const char *filename) {
     /* The parser has not been implemented yet */
 
     AList_t *tokens = tokenize(filename);

@@ -80,9 +80,7 @@ AList_t *tokenize(const char *str) {
                 token.type = TOK_STRING;
                 token.str = malloc(string_length + 1);
                 assert(token.str);
-                memcpy(token.str, start, string_length);
-                token.str[string_length] = '\0';
-
+                strlcpy(token.str, start, string_length + 1);
                 str++; // Skip closing quotes
                 break;
             }
@@ -100,8 +98,7 @@ AList_t *tokenize(const char *str) {
                     token.type = TOK_NUMBER;
                     token.str = malloc(string_length + 1);
                     assert(token.str);
-                    memcpy(token.str, start, string_length);
-                    token.str[string_length] = '\0';
+                    strlcpy(token.str, start, string_length + 1);
                     break;
                 }
 
