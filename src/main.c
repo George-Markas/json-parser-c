@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "ansi.h"
+#include "error.h"
 #include "tokenizer.h"
 #include "parser.h"
 
@@ -33,7 +34,6 @@ void print_tokens(AList_t *tokens) {
         printf(GREEN(REGULAR)"%s "RESET"%s\n", token_type_map[token.type], token_str);
         if (token.str) free(token.str);
     }
-    putchar('\n');
     array_list_delete(tokens);
 }
 
@@ -57,9 +57,8 @@ void print_json_values(AList_t *json_values) {
                 printf(CYAN(REGULAR)"%s "RESET"null\n", json_type_map[json.type]);
                 break;
             default:
-                printf("Unknown type\n");
+                ERROR("Unkown type");
         }
     }
-    putchar('\n');
     array_list_delete(json_values);
 }
