@@ -8,17 +8,17 @@
 #include <assert.h>
 
 const char *token_type_map[] = {
-    [TOK_L_BRACE]   = "TOK_L_BRACE  ",
-    [TOK_R_BRACE]   = "TOK_R_BRACE  ",
+    [TOK_L_BRACE]   = "TOK_L_BRACE",
+    [TOK_R_BRACE]   = "TOK_R_BRACE",
     [TOK_L_BRACKET] = "TOK_L_BRACKET",
     [TOK_R_BRACKET] = "TOK_R_BRACKET",
-    [TOK_COLON]     = "TOK_COLON    ",
-    [TOK_COMMA]     = "TOK_COMMA    ",
-    [TOK_STRING]    = "TOK_STRING:  ",
-    [TOK_NUMBER]    = "TOK_NUMBER:  ",
-    [TOK_TRUE]      = "TOK_TRUE     ",
-    [TOK_FALSE]     = "TOK_FALSE    ",
-    [TOK_NULL]      = "TOK_NULL     "
+    [TOK_COLON]     = "TOK_COLON",
+    [TOK_COMMA]     = "TOK_COMMA",
+    [TOK_STRING]    = "TOK_STRING",
+    [TOK_NUMBER]    = "TOK_NUMBER",
+    [TOK_TRUE]      = "TOK_TRUE",
+    [TOK_FALSE]     = "TOK_FALSE",
+    [TOK_NULL]      = "TOK_NULL"
 };
 
 char *file_to_string(const char *filename) {

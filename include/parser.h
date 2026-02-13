@@ -23,4 +23,4 @@ typedef struct Json_Value {
 
 extern const char *json_type_map[];
 
-void dummy_parse(const char *filename);
+AList_t *parse(AList_t *tokens);
