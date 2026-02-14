@@ -24,10 +24,10 @@ const char *token_type_map[] = {
 };
 
 const char *token_error_map[] = {
-    [-1 * ERROR_INVALID_LIST]     = "Invalid token list",
-    [-1 * ERROR_OUT_OF_BOUNDS]    = "Out of bounds token index",
-    [-1 * ERROR_FAILED_RETRIEVAL] = "Could not get token",
-    [-1 * ERROR_UNEXPECTED_TOKEN] = "Unexpected token"
+    [-1 * TOKEN_INVALID_LIST]     = "Invalid token list",
+    [-1 * TOKEN_OUT_OF_BOUNDS]    = "Out of bounds token index",
+    [-1 * TOKEN_RETRIEVAL_FAILED] = "Could not get token",
+    [-1 * TOKEN_UNEXPECTED_TOKEN] = "Unexpected token"
 };
 //@formatter:on
 
@@ -58,13 +58,13 @@ token_t get_token(AList_t *tokens, const size_t index) {
     if (!tokens)
         return (token_t) {
             .type = TOKEN_ERROR,
-            .error = ERROR_INVALID_LIST
+            .error = TOKEN_INVALID_LIST
         };
 
     if (index >= tokens->length)
         return (token_t) {
             .type = TOKEN_ERROR,
-            .error = ERROR_OUT_OF_BOUNDS
+            .error = TOKEN_OUT_OF_BOUNDS
         };
 
     // Avoid dereferencing NULL
@@ -72,7 +72,7 @@ token_t get_token(AList_t *tokens, const size_t index) {
     if (!token)
         return (token_t) {
             .type = TOKEN_ERROR,
-            .error = ERROR_FAILED_RETRIEVAL
+            .error = TOKEN_RETRIEVAL_FAILED
         };
 
     return *token;
@@ -88,7 +88,12 @@ AList_t *tokenize(const char *str) {
     size_t length;
 
     while ((length = u8_next(str, &ch)) && ch != '\0') {
-        token_t token = { .str = NULL };
+        token_t token = {
+            .string = {
+                .str = NULL,
+                .length = 0
+            }
+        };
 
         switch (ch) {
             case ' ':
@@ -116,9 +121,10 @@ AList_t *tokenize(const char *str) {
                 const size_t string_length = str - start;
 
                 token.type = TOKEN_STRING;
-                token.str = malloc(string_length + 1);
-                assert(token.str);
-                strlcpy(token.str, start, string_length + 1);
+                token.string.str = malloc(string_length + 1);
+                token.string.length = string_length;
+                assert(token.string.str);
+                strlcpy(token.string.str, start, string_length + 1);
 
                 str++; // Skip closing quotes
                 break;
@@ -129,16 +135,19 @@ AList_t *tokenize(const char *str) {
                 if (isdigit(ch) || ch == '-') {
                     const char *start = str;
                     if (ch == '-') str++; // Skip sign
+
+                    //@formatter:off
                     while (u8_next(str, &ch) && (isdigit(ch) || ch == '.' ||
-                                                 ch == 'e' || ch == 'E' ||
-                                                 ch == '+' || ch == '-'))
-                        str++;
+                                                   ch == 'e' || ch == 'E' ||
+                                                   ch == '+' || ch == '-')) str++;
+                    //@formatter:on
                     const size_t string_length = str - start;
 
                     token.type = TOKEN_NUMBER;
-                    token.str = malloc(string_length + 1);
-                    assert(token.str);
-                    strlcpy(token.str, start, string_length + 1);
+                    token.string.str = malloc(string_length + 1);
+                    token.string.length = string_length;
+                    assert(token.string.str);
+                    strlcpy(token.string.str, start, string_length + 1);
                     break;
                 }
 
@@ -180,8 +189,7 @@ cleanup:
             ERROR("%s", token_error_map[token.error]);
             exit(EXIT_FAILURE);
         }
-
-        if (token.str) free(token.str);
+        if (token.string.str) free(token.string.str);
     }
 
     array_list_delete(tokens);

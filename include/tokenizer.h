@@ -19,23 +19,27 @@ typedef enum {
 
 extern const char *token_type_map[];
 
-typedef enum {
-    ERROR_INVALID_LIST = -1,
-    ERROR_OUT_OF_BOUNDS = -2,
-    ERROR_FAILED_RETRIEVAL = -3,
-    ERROR_UNEXPECTED_TOKEN = -4,
-} Token_Error;
-
-extern const char *token_error_map[];
-
 typedef struct Token {
     Token_Type type;
 
     union {
-        char *str;
+        struct {
+            char *str;
+            size_t length; // To pass to strndup() on the parser side
+        } string;
+
         int error;
     };
 } token_t;
+
+typedef enum {
+    TOKEN_INVALID_LIST = -1,
+    TOKEN_OUT_OF_BOUNDS = -2,
+    TOKEN_RETRIEVAL_FAILED = -3,
+    TOKEN_UNEXPECTED_TOKEN = -4,
+} Token_Error;
+
+extern const char *token_error_map[];
 
 /**
  * @brief Load the contents of a text file into a string.
