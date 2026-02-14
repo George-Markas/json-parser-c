@@ -91,7 +91,7 @@ void error(const char *file, const int line,  const char *error_message, ...) {
     free(formatted_message);
 }
 
-void not_implemented(const char *feature) {
+void not_implemented(const char *feature, const bool terminate) {
     printf(YELLOW(UNDERLINE)"%s"YELLOW(REGULAR)" has not been implemented\n", feature);
-    exit(EXIT_FAILURE);
+    if (terminate) exit(EXIT_FAILURE);
 }

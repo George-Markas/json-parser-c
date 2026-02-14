@@ -7,19 +7,29 @@
 #include <ctype.h>
 #include <assert.h>
 
+//@formatter:off
 const char *token_type_map[] = {
-    [TOK_L_BRACE]   = "TOK_L_BRACE",
-    [TOK_R_BRACE]   = "TOK_R_BRACE",
-    [TOK_L_BRACKET] = "TOK_L_BRACKET",
-    [TOK_R_BRACKET] = "TOK_R_BRACKET",
-    [TOK_COLON]     = "TOK_COLON",
-    [TOK_COMMA]     = "TOK_COMMA",
-    [TOK_STRING]    = "TOK_STRING",
-    [TOK_NUMBER]    = "TOK_NUMBER",
-    [TOK_TRUE]      = "TOK_TRUE",
-    [TOK_FALSE]     = "TOK_FALSE",
-    [TOK_NULL]      = "TOK_NULL"
+    [TOKEN_L_BRACE] =   "TOKEN_L_BRACE",
+    [TOKEN_R_BRACE] =   "TOKEN_R_BRACE",
+    [TOKEN_L_BRACKET] = "TOKEN_L_BRACKET",
+    [TOKEN_R_BRACKET] = "TOKEN_R_BRACKET",
+    [TOKEN_COLON] =     "TOKEN_COLON",
+    [TOKEN_COMMA] =     "TOKEN_COMMA",
+    [TOKEN_STRING] =    "TOKEN_STRING",
+    [TOKEN_NUMBER] =    "TOKEN_NUMBER",
+    [TOKEN_TRUE] =      "TOKEN_TRUE",
+    [TOKEN_FALSE] =     "TOKEN_FALSE",
+    [TOKEN_NULL] =      "TOKEN_NULL",
+    [TOKEN_ERROR] =     "TOKEN_ERROR",
 };
+
+const char *token_error_map[] = {
+    [-1 * ERROR_INVALID_LIST]     = "Invalid token list",
+    [-1 * ERROR_OUT_OF_BOUNDS]    = "Out of bounds token index",
+    [-1 * ERROR_FAILED_RETRIEVAL] = "Could not get token",
+    [-1 * ERROR_UNEXPECTED_TOKEN] = "Unexpected token"
+};
+//@formatter:on
 
 char *file_to_string(const char *filename) {
     FILE *f = fopen(filename, "r");
@@ -35,12 +45,37 @@ char *file_to_string(const char *filename) {
     char *buffer = malloc(size + 1);
     assert(buffer);
 
-    __attribute__((unused)) int read = (int) fread(buffer, 1, size, f);
+    // Hush the compiler
+    __attribute__((unused)) size_t read = fread(buffer, 1, size, f);
 
     buffer[size] = '\0';
     fclose(f);
 
     return buffer;
+}
+
+token_t get_token(AList_t *tokens, const size_t index) {
+    if (!tokens)
+        return (token_t) {
+            .type = TOKEN_ERROR,
+            .error = ERROR_INVALID_LIST
+        };
+
+    if (index >= tokens->length)
+        return (token_t) {
+            .type = TOKEN_ERROR,
+            .error = ERROR_OUT_OF_BOUNDS
+        };
+
+    // Avoid dereferencing NULL
+    token_t *token = array_list_get(tokens, index);
+    if (!token)
+        return (token_t) {
+            .type = TOKEN_ERROR,
+            .error = ERROR_FAILED_RETRIEVAL
+        };
+
+    return *token;
 }
 
 AList_t *tokenize(const char *str) {
@@ -52,7 +87,7 @@ AList_t *tokenize(const char *str) {
     u8char_t ch;
     size_t length;
 
-    while (((length = u8_next(str, &ch))) && ch != '\0') {
+    while ((length = u8_next(str, &ch)) && ch != '\0') {
         token_t token = { .str = NULL };
 
         switch (ch) {
@@ -62,25 +97,29 @@ AList_t *tokenize(const char *str) {
             case '\r':
                 str++; // Ignore whitespaces
                 continue;
-            case '{': token.type = TOK_L_BRACE; break;
-            case '}': token.type = TOK_R_BRACE; break;
-            case '[': token.type = TOK_L_BRACKET; break;
-            case ']': token.type = TOK_R_BRACKET; break;
-            case ':': token.type = TOK_COLON; break;
-            case ',': token.type = TOK_COMMA; break;
+
+            //@formatter:off
+            case '{': token.type = TOKEN_L_BRACE;   break;
+            case '}': token.type = TOKEN_R_BRACE;   break;
+            case '[': token.type = TOKEN_L_BRACKET; break;
+            case ']': token.type = TOKEN_R_BRACKET; break;
+            case ':': token.type = TOKEN_COLON;     break;
+            case ',': token.type = TOKEN_COMMA;     break;
+            //@formatter:on
 
             /* String */
             case '"': {
                 str++; // Skip opening quotes
 
                 const char *start = str;
-                while (((length = u8_next(str, &ch))) && ch != '"' && ch != '\0') str += length;
+                while ((length = u8_next(str, &ch)) && ch != '"' && ch != '\0') str += length;
                 const size_t string_length = str - start;
 
-                token.type = TOK_STRING;
+                token.type = TOKEN_STRING;
                 token.str = malloc(string_length + 1);
                 assert(token.str);
                 strlcpy(token.str, start, string_length + 1);
+
                 str++; // Skip closing quotes
                 break;
             }
@@ -91,11 +130,12 @@ AList_t *tokenize(const char *str) {
                     const char *start = str;
                     if (ch == '-') str++; // Skip sign
                     while (u8_next(str, &ch) && (isdigit(ch) || ch == '.' ||
-                        ch == 'e' || ch == 'E' ||
-                        ch == '+' || ch == '-')) str++;
+                                                 ch == 'e' || ch == 'E' ||
+                                                 ch == '+' || ch == '-'))
+                        str++;
                     const size_t string_length = str - start;
 
-                    token.type = TOK_NUMBER;
+                    token.type = TOKEN_NUMBER;
                     token.str = malloc(string_length + 1);
                     assert(token.str);
                     strlcpy(token.str, start, string_length + 1);
@@ -104,27 +144,27 @@ AList_t *tokenize(const char *str) {
 
                 /* True */
                 if (!strncmp(str, "true", 4)) {
-                    token.type = TOK_TRUE;
+                    token.type = TOKEN_TRUE;
                     str += 4;
                     break;
                 }
 
                 /* False */
                 if (!strncmp(str, "false", 5)) {
-                    token.type = TOK_FALSE;
+                    token.type = TOKEN_FALSE;
                     str += 5;
                     break;
                 }
 
                 /* Null */
                 if (!strncmp(str, "null", 4)) {
-                    token.type = TOK_NULL;
+                    token.type = TOKEN_NULL;
                     str += 4;
                     break;
                 }
 
                 ERROR("Unexpected token '%s'", str);
-                return NULL;
+                goto cleanup;
         }
 
         array_list_add(tokens, &token);
@@ -132,4 +172,18 @@ AList_t *tokenize(const char *str) {
     }
 
     return tokens;
+
+cleanup:
+    for (size_t i = 0; i < tokens->length; i++) {
+        const token_t token = get_token(tokens, i);
+        if (token.type == TOKEN_ERROR) {
+            ERROR("%s", token_error_map[token.error]);
+            exit(EXIT_FAILURE);
+        }
+
+        if (token.str) free(token.str);
+    }
+
+    array_list_delete(tokens);
+    return NULL;
 }
